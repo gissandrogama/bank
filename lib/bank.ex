@@ -1,18 +1,6 @@
 defmodule Bank do
-  @moduledoc """
-  Documentation for `Bank`.
-  """
 
-  @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> Bank.hello()
-      :world
-
-  """
-  def hello do
-    :world
+  def start do
+      File.write!("contas.txt", :erlang.term_to_binary([]))
   end
 end

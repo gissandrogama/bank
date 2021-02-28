@@ -6,6 +6,7 @@ defmodule Account do
   As funções são: `register/1`, `tansfer/4` e `withdraw/2`
   """
   defstruct user: User, balance: 1000
+  @accounts "contas.txt"
 
   @doc """
   Essa função associa um usuário a uma conta.
@@ -27,7 +28,18 @@ defmodule Account do
       }
 
   """
-  def register(user), do: %__MODULE__{user: user}
+  def register(user) do
+    binary =
+      ([%__MODULE__{user: user}] ++ get_accounts())
+      |> :erlang.term_to_binary()
+
+    File.write!(@accounts, binary)
+  end
+
+  def get_accounts do
+    {:ok, binary} = File.read(@accounts)
+    :erlang.binary_to_term(binary)
+  end
 
   @doc """
   Funcionalidade de executar uma transferencia de valores de uma conta para outra.
@@ -75,6 +87,8 @@ defmodule Account do
         [of, to]
     end
   end
+
+  def get_to_email(email), do: Enum.find(get_accounts, &(&1.c.user.email == email))
 
   @doc """
   Função que permite que um usuário faça um saque.

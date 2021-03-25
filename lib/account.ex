@@ -79,14 +79,14 @@ defmodule Account do
 
   """
   def transfer(of, to, value) do
-    of = get_to_email(of.user.email)
-
+    of = get_to_email(of)
+    to = get_to_email(to)
     cond do
       valid_balance(of.balance, value) ->
         {:error, "insufficient funds"}
 
       true ->
-        accounts = get_accounts() |> List.delete(of) |> List.delete(to)
+        accounts = delete([of, to])
         of = %Account{of | balance: of.balance - value}
         to = %Account{to | balance: to.balance + value}
         accounts = accounts ++ [of, to]
@@ -95,7 +95,11 @@ defmodule Account do
     end
   end
 
-  def get_to_email(email), do: Enum.find(get_accounts(), &(&1.user.email == email))
+  defp get_to_email(email), do: Enum.find(get_accounts(), &(&1.user.email == email))
+
+  def delete(account_delete) do
+    Enum.reduce(account_delete, get_accounts(), fn c, acc -> List.delete(acc, c) end)
+  end
 
   @doc """
   Função que permite que um usuário faça um saque.
@@ -120,12 +124,13 @@ defmodule Account do
 
   """
   def withdraw(account, value) do
+    account = get_to_email(account)
     cond do
       valid_balance(account.balance, value) ->
         {:error, "insufficient funds"}
 
       true ->
-        accounts = get_accounts() |> List.delete(account)
+        accounts = delete([account])
         account = %Account{account | balance: account.balance - value}
         accounts = accounts ++ [account]
 

@@ -125,8 +125,11 @@ defmodule Account do
         {:error, "insufficient funds"}
 
       true ->
+        accounts = get_accounts() |> List.delete(account)
         account = %Account{account | balance: account.balance - value}
+        accounts = accounts ++ [account]
 
+        File.write!(@accounts, :erlang.term_to_binary(accounts))
         {:ok, account, "email message sent"}
     end
   end

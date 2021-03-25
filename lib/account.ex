@@ -29,11 +29,17 @@ defmodule Account do
 
   """
   def register(user) do
-    binary =
-      ([%__MODULE__{user: user}] ++ get_accounts())
-      |> :erlang.term_to_binary()
+    case get_to_email(user.email) do
+      nil ->
+        binary =
+          ([%__MODULE__{user: user}] ++ get_accounts())
+          |> :erlang.term_to_binary()
 
-    File.write!(@accounts, binary)
+        File.write!(@accounts, binary)
+
+      _ ->
+        {:error, "Account already exit!"}
+    end
   end
 
   def get_accounts do
@@ -72,23 +78,24 @@ defmodule Account do
       ]
 
   """
-  def transfer(accounts, of, to, value) do
-    of = Enum.find(accounts, fn account -> account.user.email == of.user.email end)
+  def transfer(of, to, value) do
+    of = get_to_email(of.user.email)
 
     cond do
       valid_balance(of.balance, value) ->
         {:error, "insufficient funds"}
 
       true ->
-        to = Enum.find(accounts, fn account -> account.user.email == to.user.email end)
+        accounts = get_accounts() |> List.delete(of) |> List.delete(to)
         of = %Account{of | balance: of.balance - value}
         to = %Account{to | balance: to.balance + value}
+        accounts = accounts ++ [of, to]
 
-        [of, to]
+        File.write!(@accounts, :erlang.term_to_binary(accounts))
     end
   end
 
-  def get_to_email(email), do: Enum.find(get_accounts, &(&1.c.user.email == email))
+  def get_to_email(email), do: Enum.find(get_accounts(), &(&1.user.email == email))
 
   @doc """
   Função que permite que um usuário faça um saque.

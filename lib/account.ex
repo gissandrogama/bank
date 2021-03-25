@@ -91,6 +91,8 @@ defmodule Account do
         to = %Account{to | balance: to.balance + value}
         accounts = accounts ++ [of, to]
 
+        Trasactions.record("transaction", of, value, Date.utc_today(), to)
+
         File.write!(@accounts, :erlang.term_to_binary(accounts))
     end
   end
@@ -133,6 +135,8 @@ defmodule Account do
         accounts = delete([account])
         account = %Account{account | balance: account.balance - value}
         accounts = accounts ++ [account]
+
+        Trasactions.record("withdraw", account, value, Date.utc_today(), nil)
 
         File.write!(@accounts, :erlang.term_to_binary(accounts))
         {:ok, account, "email message sent"}

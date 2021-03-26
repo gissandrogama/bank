@@ -22,11 +22,7 @@ defmodule Account do
   ## Exemplo
 
       iex> Account.register %User{name: "Luana", email: "luana@email.com"}
-      %Account{
-      balance: 1000,
-      user: %User{email: "luana@email.com", name: "Luana"}
-      }
-
+      :ok
   """
   def register(user) do
     case get_to_email(user.email) do
@@ -42,6 +38,27 @@ defmodule Account do
     end
   end
 
+  @doc """
+  Função ler o arquivo `"contas.txt"` e exibe os dados salvos nele.
+
+  ## Parametro da função
+
+  ## Informações adicionais
+
+  - caso não exista nenhum dado salvo é retornado uma lista vazia.
+
+  ## Exemplo
+
+      iex> Account.register(%User{name: "Henry", email: "henry@email.com"})
+      iex> Account.get_accounts()
+      [
+        %Account{
+          balance: 1000,
+          user: %User{name: "Henry", email: "henry@email.com"}
+        }
+      ]
+
+  """
   def get_accounts do
     {:ok, binary} = File.read(@accounts)
     :erlang.binary_to_term(binary)
@@ -63,24 +80,16 @@ defmodule Account do
 
   ## Exemplo
 
-      iex> account1 = Account.register(%User{name: "Gissandro", email: "gissandro@email.com"})
-      iex> account2 = Account.register(%User{name: "Henry", email: "henry@email.com"})
-      iex> Account.transfer([account1, account2], account1, account2, 500)
-      [
-        %Account{
-          balance: 500,
-          user: %User{name: "Gissandro", email: "gissandro@email.com"}
-        },
-        %Account{
-          balance: 1500,
-          user: %User{name: "Henry", email: "henry@email.com"}
-        }
-      ]
+      iex> Account.register(%User{name: "Gissandro", email: "gissandro@email.com"})
+      iex> Account.register(%User{name: "Henry", email: "henry@email.com"})
+      iex> Account.transfer("gissandro@email.com", "henry@email.com", 500)
+      :ok
 
   """
   def transfer(of, to, value) do
     of = get_to_email(of)
     to = get_to_email(to)
+
     cond do
       valid_balance(of.balance, value) ->
         {:error, "insufficient funds"}
@@ -117,8 +126,8 @@ defmodule Account do
 
   ## Exemplo
 
-      iex> account1 = Account.register(%User{name: "Gissandro", email: "gissandro@email.com"})
-      iex> Account.withdraw(account1, 500)
+      iex> Account.register(%User{name: "Gissandro", email: "gissandro@email.com"})
+      iex> Account.withdraw("gissandro@email.com", 500)
       {:ok, %Account{
         balance: 500,
         user: %User{email: "gissandro@email.com", name: "Gissandro"}
@@ -127,6 +136,7 @@ defmodule Account do
   """
   def withdraw(account, value) do
     account = get_to_email(account)
+
     cond do
       valid_balance(account.balance, value) ->
         {:error, "insufficient funds"}

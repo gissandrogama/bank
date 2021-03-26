@@ -8,10 +8,9 @@ defmodule UserTest do
 
   describe "new/1" do
     test "create an user" do
-      user = User.new("Gissandro","gissandro@gmail.com")
+      user = User.new("Gissandro", "gissandro@gmail.com")
 
       assert user.name == "Gissandro"
     end
   end
-
 end

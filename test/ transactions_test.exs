@@ -1,6 +1,6 @@
 defmodule TransactionsTest do
   use ExUnit.Case
-  doctest Trasactions
+  doctest Transactions
 
   setup do
     File.write!("contas.txt", :erlang.term_to_binary([]))
@@ -13,7 +13,7 @@ defmodule TransactionsTest do
   end
 
   test "trasactions structure" do
-    assert %Trasactions{} == %Trasactions{
+    assert %Transactions{} == %Transactions{
              date: Date.utc_today(),
              of: nil,
              to: nil,
@@ -25,11 +25,11 @@ defmodule TransactionsTest do
   describe "get_all/0" do
     test "get all transactions" do
       Account.register(%User{name: "Gissandro", email: "gissandro@gmail.com"})
-      Account.register(%User{name: "Gissandro", email: "luana@gmail.com"})
+      Account.register(%User{name: "Luana", email: "luana@gmail.com"})
       Account.transfer("gissandro@gmail.com", "luana@gmail.com", 500)
 
-      assert Trasactions.get_all() == [
-               %Trasactions{
+      assert Transactions.get_all() == [
+               %Transactions{
                  date: ~D[2021-03-26],
                  of: %Account{
                    balance: 500,
@@ -37,7 +37,7 @@ defmodule TransactionsTest do
                  },
                  to: %Account{
                    balance: 1500,
-                   user: %User{email: "luana@gmail.com", name: "Gissandro"}
+                   user: %User{email: "luana@gmail.com", name: "Luana"}
                  },
                  type: "transaction",
                  value: 500

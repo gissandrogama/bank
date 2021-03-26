@@ -1,4 +1,4 @@
-defmodule Trasactions do
+defmodule Transactions do
   defstruct date: Date.utc_today(), type: nil, value: 0, of: nil, to: nil
 
   @transactions "transactions.txt"

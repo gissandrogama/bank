@@ -30,7 +30,7 @@ defmodule TransactionsTest do
 
       assert Transactions.get_all() == [
                %Transactions{
-                 date: ~D[2021-03-26],
+                 date: Date.utc_today(),
                  of: %Account{
                    balance: 500,
                    user: %User{email: "gissandro@gmail.com", name: "Gissandro"}
